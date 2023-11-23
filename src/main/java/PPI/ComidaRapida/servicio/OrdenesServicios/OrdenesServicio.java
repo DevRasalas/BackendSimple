@@ -1,8 +1,12 @@
 package PPI.ComidaRapida.servicio.OrdenesServicios;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +29,14 @@ public class OrdenesServicio implements IOrdenesServicio {
     private Producto_OrdenRepository producto_OrdenRepository;
     @Autowired
     private ProductoRepositorio productoRepository;
-    @Autowired UsuariosRepositorio usuariosRepositorio;
-    
+    @Autowired 
+    private UsuariosRepositorio usuariosRepositorio;
+    public final static Logger LOGGER = LoggerFactory.getLogger(OrdenesServicio.class);
 
     @Override
     @Transactional
     public void crearOrdenConProducto(Map<String, Object> ordenes) {
-        // Extraer la orden del JSON
+        //Extraemos los elementos "orden" del json
 
         Map<String, Object> ordenData = (Map<String, Object>) ordenes.get("orden");
         Ordenes nuevaOrden = new Ordenes();
@@ -41,15 +46,15 @@ public class OrdenesServicio implements IOrdenesServicio {
         nuevaOrden.setMontoTotal(Integer.valueOf(ordenData.get("montoTotal").toString()));
         ordenesRepository.save(nuevaOrden);
 
-        // Extraer la lista de productos del JSON
+        // Extraemos los elementos "productos" del json
         List<Map<String, Object>> productosData = (List<Map<String, Object>>) ordenes.get("productos");
         if (productosData != null) {
-            // Recorrer la lista de productos y crear relaciones ProductoOrden
+            
             for (Map<String, Object> productoData : productosData) {
                 Integer idProducto = Integer.valueOf(productoData.get("idProducto").toString());
                 Producto producto = productoRepository.findById(idProducto).orElse(null);
                 Integer cantidadProd = Integer.valueOf(productoData.get("cantidad").toString());
-                // producto.setPrecioProducto(Integer.valueOf(productoData.get("precioFinal").toString()));
+                //Guardamos todo en la tabla intermedia
                 if (producto != null) {
                     Producto_Ordenes productoOrden = new Producto_Ordenes();
                     productoOrden.setOrdenes(nuevaOrden);
@@ -67,8 +72,8 @@ public class OrdenesServicio implements IOrdenesServicio {
 
     @Override
     public List<Ordenes> mostrarOrdenes(Integer idUsuario) {
-        
         return this.ordenesRepository.obtenerOrdenes(idUsuario);
+        
     }
 
 

@@ -25,7 +25,7 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class ProductoServicio implements IProductosServicio{
-
+    //Establecemos la ubicacion donde se guardaran las imagenes
     @Value("${media.location}")
     private String direccionImagen;
     public final static Logger LOGGER = LoggerFactory.getLogger(ProductoServicio.class);
@@ -43,13 +43,14 @@ public class ProductoServicio implements IProductosServicio{
 
     @Override
     public String almacenarImagen(MultipartFile multipartFile, String nombre) {
+        //Excepcion si el archivo esta vacio
         try{
             if(multipartFile.isEmpty()){
             throw new RuntimeException("Archivo vacio");
         }
         String tipoMIME = multipartFile.getContentType();
        LOGGER.info(tipoMIME);
-
+        //Cambiamos el formato del nombre, eliminamos espacios para usarlo como nombre de la imagen
         String extension = "." + tipoMIME.substring("image/".length());
         LOGGER.info(extension);
         String nombreArchivo = nombre.replace(" ", "_").replace("\"", "") + extension;
@@ -57,7 +58,7 @@ public class ProductoServicio implements IProductosServicio{
         
         
         Path destinoImagen = ubicacionRaiz.resolve(Paths.get(nombreArchivo)).normalize().toAbsolutePath();
-        
+        //Guardamos localmente
         
         try(InputStream inputStream = multipartFile.getInputStream() ){
             Files.copy(inputStream, destinoImagen, StandardCopyOption.REPLACE_EXISTING);
@@ -72,7 +73,7 @@ public class ProductoServicio implements IProductosServicio{
     public Resource cargarComoRecurse(String nombreImagen) {
         try{
             Path file = ubicacionRaiz.resolve(nombreImagen);
-           org.springframework.core.io.Resource resourse = new UrlResource(file.toUri());
+            Resource resourse = new UrlResource(file.toUri());
             if(resourse.exists() || resourse.isReadable()){
                 return resourse;
             }else{

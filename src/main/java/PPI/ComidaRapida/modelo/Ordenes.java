@@ -1,6 +1,9 @@
 package PPI.ComidaRapida.modelo;
 
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +31,7 @@ public class Ordenes {
     Usuarios usuarios;
     String direccion;
     Integer montoTotal;
+    String fechaCompra = LocalDateTime.now().toString();
     
    
 }
